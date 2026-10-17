@@ -49,6 +49,9 @@ export class Event {
 
   withdraw(participantId: ParticipantId): void {
     const rank = this.findParticipantRank(participantId)
+    if (rank === -1) {
+      throw new RegistrationError(`Participant ${participantId} is not registered`)
+    }
     this.participants.splice(rank, 1)
   }
 
@@ -75,5 +78,12 @@ export class MultipleRegistrationError extends Error {
   constructor(participantId: ParticipantId) {
     super(`Registration is limited to one per participant : ${participantId} is already registered`)
     this.name = "MultipleRegistrationError"
+  }
+}
+
+export class RegistrationError extends Error {
+  constructor(message: string) {
+    super(`${message}`)
+    this.name = "RegistrationError"
   }
 }

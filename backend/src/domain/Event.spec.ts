@@ -78,5 +78,15 @@ describe("Event", () => {
       event.withdraw("CHLOE")
       expect(event.getUserStatus("BOB")).toStrictEqual("unregistered")
     })
+
+    test("A participant can't withdraw from an event they're not registered to", () => {
+      const unexpectedWithdrawal = () => event.withdraw("ALICE")
+      expect(unexpectedWithdrawal).toThrow(RegistrationError)
+    })
+
+    test("One can't withdraw from a past event", () => {
+      const unexpectedWithdrawal = () => event.withdraw("ALICE")
+      expect(unexpectedWithdrawal).toThrow(RegistrationError)
+    })
   })
 })
