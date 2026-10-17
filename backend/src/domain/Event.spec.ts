@@ -98,10 +98,33 @@ describe("Event", () => {
 
     test("Once a participant is registered, an event is emitted", () => {
       event.register("ALICE")
-      const domainEvents = event.pullDomainEvents()
-      expect(domainEvents).toContainEqual({
+      expect(event.pullDomainEvents()).toContainEqual({
         type: "participant-registered",
         participantId: "ALICE"
+      })
+    })
+
+    test("When a participant is promoted from waitlist to registered, an avent is emitted", () => {
+      event.register("ALICE")
+      event.register("BOB")
+      event.register("CHLOE")
+      event.register("DENIS")
+      event.withdraw("ALICE")
+      expect(event.pullDomainEvents()).toContainEqual({
+        type: "participant-promoted",
+        participantId: "CHLOE"
+      })
+    })
+
+    describe("Modifications", () => {
+
+
+      test.todo("Only the organizer can modify an event's capacity", () => {
+
+      })
+
+      test.todo("The capacity can only be modified to greater than number of already registered participants", () => {
+
       })
     })
   })

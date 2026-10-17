@@ -8,8 +8,9 @@ export type CreationData = {
 export type ParticipantId = string;
 export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
-export type DomainEvent = |
-{ type: "participant-registered", participantId: ParticipantId }
+export type DomainEvent =
+  | { type: "participant-registered", participantId: ParticipantId }
+  | { type: "participant-promoted", participantId: ParticipantId }
 
 
 export class Event extends AggragateRoot<DomainEvent> {
@@ -64,6 +65,13 @@ export class Event extends AggragateRoot<DomainEvent> {
       throw new RegistrationError(`Participant ${participantId} is not registered`)
     }
     this.participants.splice(rank, 1)
+    const promoted = this.participants.at(this.capacity - 1)
+    if (promoted) {
+      this.record({
+        type: "participant-promoted",
+        participantId: promoted
+      })
+    }
   }
 
   private findParticipantRank(participantId: ParticipantId): number {
