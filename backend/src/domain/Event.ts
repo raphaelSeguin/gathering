@@ -4,7 +4,7 @@ export type CreationData = {
 }
 
 export type ParticipantId = string;
-export type RegistrationStatus = "confirmed" | "waitlisted"
+export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
 export class Event {
   private readonly capacity: number
@@ -38,12 +38,16 @@ export class Event {
   }
 
   getUserStatus(participantId: ParticipantId): RegistrationStatus {
-    return this.findParticipantRank(participantId) < this.capacity
+    const rank = this.findParticipantRank(participantId)
+    if (rank === -1) {
+      return "unregistered"
+    }
+    return rank < this.capacity
       ? "confirmed"
       : "waitlisted"
   }
 
-  withdraw(participantId: ParticipantId) {
+  withdraw(participantId: ParticipantId): void {
     const rank = this.findParticipantRank(participantId)
     this.participants.splice(rank, 1)
   }

@@ -53,13 +53,30 @@ describe("Event", () => {
       expect(doubleRegistration).toThrow(MultipleRegistrationError)
     })
 
-    test("A registered participant's withdrawal promotes the first one on the wait list", () => {
+    test("A confirmed participant's withdrawal promotes the first one on the wait list", () => {
       event.register("ALICE")
       event.register("BOB")
       event.register("CHLOE")
       expect(event.getUserStatus("CHLOE")).toStrictEqual("waitlisted")
       event.withdraw("ALICE")
       expect(event.getUserStatus("CHLOE")).toStrictEqual("confirmed")
+    })
+
+    test("A waitlisted participant's withdrawal doesn't change donfirmed participants", () => {
+      event.register("ALICE")
+      event.register("BOB")
+      event.register("CHLOE")
+      expect(event.getUserStatus("CHLOE")).toStrictEqual("waitlisted")
+      event.withdraw("CHLOE")
+      expect(event.getUserStatus("ALICE")).toStrictEqual("confirmed")
+      expect(event.getUserStatus("BOB")).toStrictEqual("confirmed")
+    })
+
+    test("After withdrawal a participant becomes unregistered", () => {
+      event.register("CHLOE")
+      expect(event.getUserStatus("CHLOE")).toStrictEqual("confirmed")
+      event.withdraw("CHLOE")
+      expect(event.getUserStatus("BOB")).toStrictEqual("unregistered")
     })
   })
 })
