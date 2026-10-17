@@ -7,16 +7,7 @@ import { useGatheringsApi } from '@/composables/useGatheringsApi'
 import { ApiError } from '@/api/client'
 import { aGathering } from '@/__tests__/fixtures'
 
-vi.mock('@/composables/useGatheringsApi', () => {
-  const api = {
-    list: vi.fn(),
-    get: vi.fn(),
-    create: vi.fn(),
-    updateCapacity: vi.fn(),
-    register: vi.fn(),
-  }
-  return { useGatheringsApi: () => api }
-})
+vi.mock('@/composables/useGatheringsApi', () => import('@/__tests__/gatheringsApiMock'))
 
 const api = vi.mocked(useGatheringsApi())
 

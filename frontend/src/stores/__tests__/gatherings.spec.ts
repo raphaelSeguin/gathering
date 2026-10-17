@@ -6,16 +6,7 @@ import { aGathering } from '@/__tests__/fixtures'
 import { ApiError } from '@/api/client'
 import { useGatheringsApi } from '@/composables/useGatheringsApi'
 
-vi.mock('@/composables/useGatheringsApi', () => {
-  const api = {
-    list: vi.fn(),
-    get: vi.fn(),
-    create: vi.fn(),
-    updateCapacity: vi.fn(),
-    register: vi.fn(),
-  }
-  return { useGatheringsApi: () => api }
-})
+vi.mock('@/composables/useGatheringsApi', () => import('@/__tests__/gatheringsApiMock'))
 
 describe('gatherings store — sections', () => {
   beforeEach(() => {
