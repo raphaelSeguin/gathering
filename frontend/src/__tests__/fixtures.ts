@@ -8,6 +8,7 @@ export function aGathering(overrides: Partial<GatheringDto> = {}): GatheringDto 
     date: '2027-01-01T18:00:00.000Z',
     capacity: 10,
     participantCount: 0,
+    waitlist: [],
     organizerId: 'bob',
     myStatus: 'unregistered',
     ...overrides,

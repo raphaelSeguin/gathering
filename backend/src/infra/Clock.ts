@@ -6,3 +6,9 @@ export class FixedClock implements Clock {
     return this.date
   }
 }
+
+export class SystemClock implements Clock {
+  now(): Date {
+    return new Date()
+  }
+}

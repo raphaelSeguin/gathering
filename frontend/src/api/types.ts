@@ -7,6 +7,7 @@ export type GatheringDto = {
   date: string
   capacity: number
   participantCount: number
+  waitlist: string[]
   organizerId: string
   myStatus: RegistrationStatus
 }
