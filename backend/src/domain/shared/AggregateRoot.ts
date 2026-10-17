@@ -1,5 +1,3 @@
-import { ParticipantId } from "../Event.js"
-
 export abstract class AggragateRoot<DomainEvent> {
   private domainEvents: DomainEvent[] = []
 

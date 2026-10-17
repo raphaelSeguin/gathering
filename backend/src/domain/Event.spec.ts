@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach } from "vitest"
-import { CreationData as EventCreationData, Event, InvalidDateError, InvalidCapacityError, MultipleRegistrationError, RegistrationError } from './Event.js'
+import { CreationData as EventCreationData, Gathering, InvalidDateError, InvalidCapacityError, MultipleRegistrationError, RegistrationError } from './Event.js'
 
 describe("Event", () => {
 
@@ -14,7 +14,7 @@ describe("Event", () => {
         capacity: -1,
         date: FUTURE
       }
-      const createEvent = () => new Event(creationData, NOW)
+      const createEvent = () => new Gathering(creationData, NOW)
       expect(createEvent).toThrow(InvalidCapacityError)
     })
     test("Event must be created in the future", () => {
@@ -22,13 +22,13 @@ describe("Event", () => {
         capacity: 10,
         date: PAST
       }
-      const createEvent = () => new Event(creationData, NOW)
+      const createEvent = () => new Gathering(creationData, NOW)
       expect(createEvent).toThrow(InvalidDateError)
     })
   })
 
   describe("Registration", () => {
-    let event: Event
+    let event: Gathering
     let now: Date
 
     beforeEach(() => {
@@ -37,7 +37,7 @@ describe("Event", () => {
         date: new Date("2022-03-15")
       }
       now = new Date("2020-12-31")
-      event = new Event(creationData, now)
+      event = new Gathering(creationData, now)
     })
 
     test("Registration is confirmed if capacity is not exceeded", () => {

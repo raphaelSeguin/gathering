@@ -8,13 +8,13 @@ export type CreationData = {
 export type ParticipantId = string;
 export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
-export type DomainEvent =
+export type GatheringEvent =
   | { type: "participant-registered", participantId: ParticipantId }
   | { type: "participant-waitlisted", participantId: ParticipantId }
   | { type: "participant-promoted", participantId: ParticipantId }
 
 
-export class Event extends AggragateRoot<DomainEvent> {
+export class Gathering extends AggragateRoot<GatheringEvent> {
   private readonly capacity: number
   private readonly date: Date
   private readonly participants: Array<ParticipantId> = []
@@ -43,7 +43,7 @@ export class Event extends AggragateRoot<DomainEvent> {
     if (this.participants.includes(participantId)) {
       throw new MultipleRegistrationError(participantId)
     }
-    const eventType: DomainEvent["type"] = this.participants.length < this.capacity
+    const eventType: GatheringEvent["type"] = this.participants.length < this.capacity
       ? "participant-registered"
       : "participant-waitlisted"
     this.record({
