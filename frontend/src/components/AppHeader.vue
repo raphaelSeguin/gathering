@@ -6,7 +6,7 @@ const emit = defineEmits<{ logout: [] }>()
 
 <template>
   <header class="app-header">
-    <RouterLink to="/" class="app-header__brand">Meetup</RouterLink>
+    <RouterLink to="/" class="app-header__brand">Gathering</RouterLink>
     <nav aria-label="Main">
       <RouterLink to="/gatherings/new">New gathering</RouterLink>
     </nav>
