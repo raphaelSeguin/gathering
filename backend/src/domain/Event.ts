@@ -10,6 +10,7 @@ export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
 export type DomainEvent =
   | { type: "participant-registered", participantId: ParticipantId }
+  | { type: "participant-waitlisted", participantId: ParticipantId }
   | { type: "participant-promoted", participantId: ParticipantId }
 
 
@@ -42,8 +43,11 @@ export class Event extends AggragateRoot<DomainEvent> {
     if (this.participants.includes(participantId)) {
       throw new MultipleRegistrationError(participantId)
     }
+    const eventType: DomainEvent["type"] = this.participants.length < this.capacity
+      ? "participant-registered"
+      : "participant-waitlisted"
     this.record({
-      type: "participant-registered",
+      type: eventType,
       participantId
     })
     this.participants.push(participantId)

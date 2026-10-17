@@ -104,6 +104,16 @@ describe("Event", () => {
       })
     })
 
+    test("Once a participant is waitlisted, an event is emitted", () => {
+      event.register("ALICE")
+      event.register("BOB")
+      event.register("CHLOE")
+      expect(event.pullDomainEvents()).toContainEqual({
+        type: "participant-waitlisted",
+        participantId: "CHLOE"
+      })
+    })
+
     test("When a participant is promoted from waitlist to registered, an avent is emitted", () => {
       event.register("ALICE")
       event.register("BOB")
