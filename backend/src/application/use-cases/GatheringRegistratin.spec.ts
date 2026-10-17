@@ -64,4 +64,15 @@ describe("Registration to a Gathering", () => {
       gatheringId: "unknown"
     })).rejects.toThrow(GatheringNotFoundError)
   })
+
+  test("Registering returns the participant status", async () => {
+    const gatheringRegistration = new GatheringRegistration({
+      repository: gatheringRepository,
+      clock: new FixedClock(new Date("2022-03-01"))
+    })
+    const register = (usedId: string) => gatheringRegistration.execute({ usedId, gatheringId: "1234" })
+    expect(await register("ALICE")).toStrictEqual("confirmed")
+    expect(await register("BOB")).toStrictEqual("confirmed")
+    expect(await register("CHLOE")).toStrictEqual("waitlisted")
+  })
 })
