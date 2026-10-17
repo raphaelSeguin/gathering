@@ -15,7 +15,7 @@ describe("Gathering", () => {
   }
   describe("Creation", () => {
 
-    test("Gathering capacity can't be negative", () => {
+    test("Gathering capacity can't be less than two", () => {
       const creationData = {
         capacity: -1,
         date: FUTURE,

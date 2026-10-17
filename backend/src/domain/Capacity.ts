@@ -1,6 +1,6 @@
 export class Capacity {
   constructor(private readonly value: number) {
-    if (value <= 0) {
+    if (value < 2) {
       throw new InvalidCapacityCreationError(value)
     }
   }

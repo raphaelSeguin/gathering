@@ -5,6 +5,9 @@ export type CreationData = {
   readonly capacity: number;
   readonly date: Date;
   readonly organizerId: string;
+  readonly id: string;
+  readonly description: string;
+  readonly title: string;
 }
 
 export type ParticipantId = string;
@@ -21,6 +24,9 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   private readonly date: Date
   private readonly organizerId: string
   private readonly participants: Array<ParticipantId> = []
+  private readonly id: string
+  private readonly description: string
+  private readonly title: string
 
   constructor({ capacity,
     date,
@@ -38,6 +44,9 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     this.capacity = new Capacity(capacity)
     this.date = date
     this.organizerId = organizerId
+    this.id = id
+    this.description = description
+    this.title = title
   }
 
   getCapacity(): number {
@@ -48,11 +57,23 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     return this.date
   }
 
+  getId(): string {
+    return this.id
+  }
+
+  getDescription(): string {
+    return this.description
+  }
+
+  getTitle(): string {
+    return this.title
+  }
+
   register(participantId: ParticipantId) {
     if (this.participants.includes(participantId)) {
       throw new MultipleRegistrationError(participantId)
     }
-    const eventType: GatheringEvent["type"] = this.participants.length < this.capacity
+    const eventType: GatheringEvent["type"] = this.participants.length < this.capacity.getValue()
       ? "participant-registered"
       : "participant-waitlisted"
     this.record({
