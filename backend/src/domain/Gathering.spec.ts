@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach } from "vitest"
-import { CreationData as GatheringCreationData, Gathering, InvalidDateError, MultipleRegistrationError, RegistrationError, UnauthorizedCapacityModification, InvalidCapacityModificationError } from './Gathering.js'
+import { CreationData as GatheringCreationData, Gathering, InvalidDateError, MultipleRegistrationError, RegistrationError, UnauthorizedCapacityModification, InvalidCapacityModificationError, UnauthorizedTitleModification, UnauthorizedDescriptionModification } from './Gathering.js'
 import { InvalidCapacityCreationError } from "./Capacity.js"
 
 describe("Gathering", () => {
@@ -43,49 +43,49 @@ describe("Gathering", () => {
     let now: Date
 
     beforeEach(() => {
+      now = NOW
       const creationData: GatheringCreationData = {
         capacity: 2,
-        date: new Date("2022-03-15"),
+        date: FUTURE,
         organizerId: "SAM",
         ...defaultCreationData
       }
-      now = new Date("2020-12-31")
-      gathering = new Gathering(creationData, now)
+      gathering = new Gathering(creationData, NOW)
     })
 
     test("Registration is confirmed if capacity is not exceeded", () => {
-      gathering.register("ALICE")
+      gathering.register("ALICE", NOW)
       expect(gathering.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
     })
 
     test("Registration is waitlisted if capacity is exceeded", () => {
-      gathering.register("ALICE")
-      gathering.register("BOB")
-      gathering.register("CHLOE")
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
       expect(gathering.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
       expect(gathering.getParticipantStatus("BOB")).toStrictEqual("confirmed")
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
     })
 
     test("A participant can't register twice", () => {
-      gathering.register("ALICE")
-      const doubleRegistration = () => gathering.register("ALICE")
+      gathering.register("ALICE", NOW)
+      const doubleRegistration = () => gathering.register("ALICE", NOW)
       expect(doubleRegistration).toThrow(MultipleRegistrationError)
     })
 
     test("A confirmed participant's withdrawal promotes the first one on the wait list", () => {
-      gathering.register("ALICE")
-      gathering.register("BOB")
-      gathering.register("CHLOE")
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
       gathering.withdraw("ALICE")
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("confirmed")
     })
 
     test("A waitlisted participant's withdrawal doesn't change donfirmed participants", () => {
-      gathering.register("ALICE")
-      gathering.register("BOB")
-      gathering.register("CHLOE")
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
       gathering.withdraw("CHLOE")
       expect(gathering.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
@@ -93,7 +93,7 @@ describe("Gathering", () => {
     })
 
     test("After withdrawal a participant becomes unregistered", () => {
-      gathering.register("CHLOE")
+      gathering.register("CHLOE", NOW)
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("confirmed")
       gathering.withdraw("CHLOE")
       expect(gathering.getParticipantStatus("BOB")).toStrictEqual("unregistered")
@@ -110,7 +110,7 @@ describe("Gathering", () => {
     })
 
     test("Once a participant is registered, an event is emitted", () => {
-      gathering.register("ALICE")
+      gathering.register("ALICE", NOW)
       expect(gathering.pullDomainEvents()).toContainEqual({
         type: "participant-registered",
         participantId: "ALICE"
@@ -118,9 +118,9 @@ describe("Gathering", () => {
     })
 
     test("Once a participant is waitlisted, an event is emitted", () => {
-      gathering.register("ALICE")
-      gathering.register("BOB")
-      gathering.register("CHLOE")
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
       expect(gathering.pullDomainEvents()).toContainEqual({
         type: "participant-waitlisted",
         participantId: "CHLOE"
@@ -128,10 +128,10 @@ describe("Gathering", () => {
     })
 
     test("When a participant is promoted from waitlist to registered, an avent is emitted", () => {
-      gathering.register("ALICE")
-      gathering.register("BOB")
-      gathering.register("CHLOE")
-      gathering.register("DENIS")
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
+      gathering.register("DENIS", NOW)
       gathering.withdraw("ALICE")
       expect(gathering.pullDomainEvents()).toContainEqual({
         type: "participant-promoted",
@@ -166,6 +166,32 @@ describe("Gathering", () => {
       expect(gathering.getCapacity()).toStrictEqual(capacity)
     })
 
+    test("Only the organizer can modify a gathering title", () => {
+      const capacity = 50
+      const gathering = new Gathering({
+        date: FUTURE,
+        capacity: capacity,
+        organizerId: "ALICE",
+        ...defaultCreationData
+      }, NOW)
+      const changeCapacity = () => gathering.changeTitle("Réunion", "BOB")
+      expect(changeCapacity).toThrow(UnauthorizedTitleModification)
+      expect(gathering.getTitle()).toStrictEqual(defaultCreationData.title)
+    })
+
+    test("Only the organizer can modify a gathering description", () => {
+      const capacity = 50
+      const gathering = new Gathering({
+        date: FUTURE,
+        capacity: capacity,
+        organizerId: "ALICE",
+        ...defaultCreationData
+      }, NOW)
+      const changeCapacity = () => gathering.changeDescription("autre description", "BOB")
+      expect(changeCapacity).toThrow(UnauthorizedDescriptionModification)
+      expect(gathering.getDescription()).toStrictEqual(defaultCreationData.description)
+    })
+
     test("The capacity can only be modified to at least the number of already registered participants", () => {
       const capacity = 50
       const gathering = new Gathering({
@@ -174,8 +200,8 @@ describe("Gathering", () => {
         organizerId: "ALICE",
         ...defaultCreationData
       }, NOW)
-      gathering.register("BOB")
-      gathering.register("CHLOE")
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
       const changeCapacity = () => gathering.changeCapacity(1, "ALICE")
       expect(changeCapacity).toThrow(InvalidCapacityModificationError)
       expect(gathering.getCapacity()).toStrictEqual(capacity)

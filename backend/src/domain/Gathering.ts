@@ -25,8 +25,8 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   private readonly organizerId: string
   private readonly participants: Array<ParticipantId> = []
   private readonly id: string
-  private readonly description: string
-  private readonly title: string
+  private description: string
+  private title: string
 
   constructor({ capacity,
     date,
@@ -69,9 +69,16 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     return this.title
   }
 
-  register(participantId: ParticipantId) {
+  getParticipants(): string[] {
+    return this.participants
+  }
+
+  register(participantId: ParticipantId, now: Date) {
     if (this.participants.includes(participantId)) {
       throw new MultipleRegistrationError(participantId)
+    }
+    if (now > this.date) {
+      throw new Error("")
     }
     const eventType: GatheringEvent["type"] = this.participants.length < this.capacity.getValue()
       ? "participant-registered"
@@ -118,6 +125,20 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     this.capacity = new Capacity(changedCapacity)
   }
 
+  changeTitle(changedTitle: string, userId: string) {
+    if (userId !== this.organizerId) {
+      throw new UnauthorizedTitleModification()
+    }
+    this.title = changedTitle
+  }
+
+  changeDescription(changedDesscription: string, userId: string) {
+    if (userId !== this.organizerId) {
+      throw new UnauthorizedDescriptionModification()
+    }
+    this.description = changedDesscription
+  }
+
   private findParticipantRank(participantId: ParticipantId): number {
     return this.participants.findIndex((pId) => pId === participantId)
   }
@@ -151,6 +172,22 @@ export class UnauthorizedCapacityModification extends Error {
     this.name = "UnauthorizedCapacityModification"
   }
 }
+
+export class UnauthorizedDescriptionModification extends Error {
+  constructor() {
+    super(`Only the organizer can change description`)
+    this.name = "UnauthorizedDescriptionModification"
+  }
+}
+
+
+export class UnauthorizedTitleModification extends Error {
+  constructor() {
+    super(`Only the organizer can change title`)
+    this.name = "UnauthorizedTitleModification"
+  }
+}
+
 
 export class InvalidCapacityModificationError extends Error {
   constructor(participantsCount: number) {
