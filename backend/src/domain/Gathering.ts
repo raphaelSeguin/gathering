@@ -57,6 +57,10 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     return this.date
   }
 
+  getOrganizerId(): string {
+    return this.organizerId
+  }
+
   getId(): string {
     return this.id
   }

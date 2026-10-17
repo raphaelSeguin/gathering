@@ -36,6 +36,15 @@ describe("Gathering", () => {
       expect((() => new Gathering(creationData, NOW)))
         .toThrow(InvalidDateError)
     })
+    test("Gathering exposes its organizer", () => {
+      const gathering = new Gathering({
+        capacity: 10,
+        date: FUTURE,
+        organizerId: "SAM",
+        ...defaultCreationData
+      }, NOW)
+      expect(gathering.getOrganizerId()).toStrictEqual("SAM")
+    })
   })
 
   describe("Registration", () => {
