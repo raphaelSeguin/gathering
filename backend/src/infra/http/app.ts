@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from "fastify"
 import { GatheringCreation } from "../../application/use-cases/GatheringCreation.js"
 import { GatheringDetails } from "../../application/use-cases/GatheringDetails.js"
+import { GatheringList } from "../../application/use-cases/GatheringList.js"
 import { GatheringModification } from "../../application/use-cases/GatheringModification.js"
 import { GatheringRegistration } from "../../application/use-cases/GatheringRegistration.js"
 import { Clock } from "../../application/ports/Clock.js"
@@ -9,6 +10,7 @@ import { IdGenerator } from "../../application/ports/IdGenerator.js"
 import { errorHandler } from "./errorHandler.js"
 import { createGatheringRoute } from "./routes/createGathering.js"
 import { getGatheringRoute } from "./routes/getGathering.js"
+import { listGatheringsRoute } from "./routes/listGatherings.js"
 import { modifyGatheringRoute } from "./routes/modifyGathering.js"
 import { registerToGatheringRoute } from "./routes/registerToGathering.js"
 
@@ -23,11 +25,13 @@ export function buildApp(deps: AppDependencies): FastifyInstance {
   app.setErrorHandler(errorHandler)
 
   const gatheringDetails = new GatheringDetails({ repository: deps.repository })
+  const gatheringList = new GatheringList({ repository: deps.repository })
   const gatheringCreation = new GatheringCreation(deps)
   const gatheringModification = new GatheringModification({ repository: deps.repository })
   const gatheringRegistration = new GatheringRegistration(deps)
 
   app.register(async (api) => {
+    listGatheringsRoute(api, { gatheringList })
     getGatheringRoute(api, { gatheringDetails })
     createGatheringRoute(api, { gatheringCreation, gatheringDetails })
     modifyGatheringRoute(api, { gatheringModification, gatheringDetails })
