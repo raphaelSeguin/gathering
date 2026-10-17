@@ -3,6 +3,7 @@ import { AggragateRoot } from "./shared/AggregateRoot.js";
 export type CreationData = {
   readonly capacity: number;
   readonly date: Date;
+  readonly organizerId: string;
 }
 
 export type ParticipantId = string;
@@ -15,20 +16,22 @@ export type GatheringEvent =
 
 
 export class Gathering extends AggragateRoot<GatheringEvent> {
-  private readonly capacity: number
+  private capacity: number
   private readonly date: Date
+  private readonly organizerId: string
   private readonly participants: Array<ParticipantId> = []
 
-  constructor({ capacity, date }: CreationData, now: Date) {
+  constructor({ capacity, date, organizerId }: CreationData, now: Date) {
     super()
     if (capacity <= 0) {
-      throw new InvalidCapacityError(capacity)
+      throw new InvalidCapacityCreationError(capacity)
     }
     if (date <= now) {
       throw new InvalidDateError(date)
     }
     this.capacity = capacity
     this.date = date
+    this.organizerId = organizerId
   }
 
   getCapacity(): number {
@@ -78,15 +81,25 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     }
   }
 
+  changeCapacity(changedCapacity: number, userId: string) {
+    if (userId !== this.organizerId) {
+      throw new UnauthorizedCapacityModification()
+    }
+    if (changedCapacity < this.participants.length) {
+      throw new InvalidCapacityModificationError(this.participants.length)
+    }
+    this.capacity = changedCapacity
+  }
+
   private findParticipantRank(participantId: ParticipantId): number {
     return this.participants.findIndex((pId) => pId === participantId)
   }
 }
 
-export class InvalidCapacityError extends Error {
+export class InvalidCapacityCreationError extends Error {
   constructor(capacity: number) {
     super(`Event capacity can't be negative or null : ${capacity} is invalid`)
-    this.name = "InvalidCapacityError"
+    this.name = "InvalidCapacityCreationError"
   }
 }
 
@@ -108,5 +121,19 @@ export class RegistrationError extends Error {
   constructor(message: string) {
     super(`${message}`)
     this.name = "RegistrationError"
+  }
+}
+
+export class UnauthorizedCapacityModification extends Error {
+  constructor() {
+    super(`Only the organizer can change capacity`)
+    this.name = "UnauthorizedCapacityModification"
+  }
+}
+
+export class InvalidCapacityModificationError extends Error {
+  constructor(participantsCount: number) {
+    super(`Capacity must be at least the number of participants (${participantsCount})`)
+    this.name = "InvalidCapacityCreationError"
   }
 }
