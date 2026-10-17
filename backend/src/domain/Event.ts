@@ -3,9 +3,13 @@ export type CreationData = {
   readonly date: Date;
 }
 
+export type ParticipantId = string;
+export type RegistrationStatus = "confirmed" | "waitlisted"
+
 export class Event {
   private readonly capacity: number
   private readonly date: Date
+  private readonly participants: Array<ParticipantId> = []
 
   constructor({ capacity, date }: CreationData, now: Date) {
     if (capacity <= 0) {
@@ -26,6 +30,27 @@ export class Event {
     return this.date
   }
 
+  register(participantId: ParticipantId) {
+    if (this.participants.includes(participantId)) {
+      throw new MultipleRegistrationError(participantId)
+    }
+    this.participants.push(participantId)
+  }
+
+  getUserStatus(participantId: ParticipantId): RegistrationStatus {
+    return this.findParticipantRank(participantId) < this.capacity
+      ? "confirmed"
+      : "waitlisted"
+  }
+
+  withdraw(participantId: ParticipantId) {
+    const rank = this.findParticipantRank(participantId)
+    this.participants.splice(rank, 1)
+  }
+
+  private findParticipantRank(participantId: ParticipantId): number {
+    return this.participants.findIndex((pId) => pId === participantId)
+  }
 }
 
 export class InvalidCapacityError extends Error {
@@ -39,5 +64,12 @@ export class InvalidDateError extends Error {
   constructor(date: Date) {
     super(`Event must be created in the future : ${date} is invalid`)
     this.name = "InvalidDateError"
+  }
+}
+
+export class MultipleRegistrationError extends Error {
+  constructor(participantId: ParticipantId) {
+    super(`Registration is limited to one per participant : ${participantId} is already registered`)
+    this.name = "MultipleRegistrationError"
   }
 }
