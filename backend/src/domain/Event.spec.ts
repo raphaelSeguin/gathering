@@ -96,5 +96,13 @@ describe("Event", () => {
       expect(unexpectedWithdrawal).toThrow(RegistrationError)
     })
 
+    test("Once a participant is registered, an event is emitted", () => {
+      event.register("ALICE")
+      const domainEvents = event.pullDomainEvents()
+      expect(domainEvents).toContainEqual({
+        type: "participant-registered",
+        participantId: "ALICE"
+      })
+    })
   })
 })

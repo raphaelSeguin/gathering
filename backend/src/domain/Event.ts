@@ -1,3 +1,5 @@
+import { AggragateRoot } from "./shared/AggregateRoot.js";
+
 export type CreationData = {
   readonly capacity: number;
   readonly date: Date;
@@ -6,12 +8,17 @@ export type CreationData = {
 export type ParticipantId = string;
 export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
-export class Event {
+export type DomainEvent = |
+{ type: "participant-registered", participantId: ParticipantId }
+
+
+export class Event extends AggragateRoot<DomainEvent> {
   private readonly capacity: number
   private readonly date: Date
   private readonly participants: Array<ParticipantId> = []
 
   constructor({ capacity, date }: CreationData, now: Date) {
+    super()
     if (capacity <= 0) {
       throw new InvalidCapacityError(capacity)
     }
@@ -34,6 +41,10 @@ export class Event {
     if (this.participants.includes(participantId)) {
       throw new MultipleRegistrationError(participantId)
     }
+    this.record({
+      type: "participant-registered",
+      participantId
+    })
     this.participants.push(participantId)
   }
 
