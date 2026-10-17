@@ -11,4 +11,8 @@ export class InMemoryGatheringRepository implements GatheringRepository {
   async findById(id: string): Promise<Gathering | undefined> {
     return this.gatherings.get(id)
   }
+
+  async findAll(): Promise<Gathering[]> {
+    return [...this.gatherings.values()]
+  }
 }
