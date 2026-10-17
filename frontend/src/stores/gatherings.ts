@@ -51,6 +51,10 @@ export const useGatheringsStore = defineStore('gatherings', () => {
     }
   }
 
+  function clearError() {
+    error.value = null
+  }
+
   function fetchAll() {
     return run(async () => {
       items.value = await api.list()
@@ -96,6 +100,7 @@ export const useGatheringsStore = defineStore('gatherings', () => {
     available,
     joined,
     organized,
+    clearError,
     fetchAll,
     fetchOne,
     register,

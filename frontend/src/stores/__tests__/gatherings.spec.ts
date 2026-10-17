@@ -142,6 +142,15 @@ describe('gatherings store — actions', () => {
     expect(store.items).toEqual([updated])
   })
 
+  it('clears the error', () => {
+    const store = useGatheringsStore()
+    store.error = 'Old error'
+
+    store.clearError()
+
+    expect(store.error).toBeNull()
+  })
+
   it('reports failure when the capacity update is rejected', async () => {
     api.updateCapacity.mockRejectedValue(new ApiError('Capacity must be at least 3', 400))
     const store = useGatheringsStore()
