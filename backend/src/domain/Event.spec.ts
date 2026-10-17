@@ -42,16 +42,16 @@ describe("Event", () => {
 
     test("Registration is confirmed if capacity is not exceeded", () => {
       event.register("ALICE")
-      expect(event.getUserStatus("ALICE")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
     })
 
     test("Registration is waitlisted if capacity is exceeded", () => {
       event.register("ALICE")
       event.register("BOB")
       event.register("CHLOE")
-      expect(event.getUserStatus("ALICE")).toStrictEqual("confirmed")
-      expect(event.getUserStatus("BOB")).toStrictEqual("confirmed")
-      expect(event.getUserStatus("CHLOE")).toStrictEqual("waitlisted")
+      expect(event.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("BOB")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
     })
 
     test("A participant can't register twice", () => {
@@ -64,26 +64,26 @@ describe("Event", () => {
       event.register("ALICE")
       event.register("BOB")
       event.register("CHLOE")
-      expect(event.getUserStatus("CHLOE")).toStrictEqual("waitlisted")
+      expect(event.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
       event.withdraw("ALICE")
-      expect(event.getUserStatus("CHLOE")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("CHLOE")).toStrictEqual("confirmed")
     })
 
     test("A waitlisted participant's withdrawal doesn't change donfirmed participants", () => {
       event.register("ALICE")
       event.register("BOB")
       event.register("CHLOE")
-      expect(event.getUserStatus("CHLOE")).toStrictEqual("waitlisted")
+      expect(event.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
       event.withdraw("CHLOE")
-      expect(event.getUserStatus("ALICE")).toStrictEqual("confirmed")
-      expect(event.getUserStatus("BOB")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("ALICE")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("BOB")).toStrictEqual("confirmed")
     })
 
     test("After withdrawal a participant becomes unregistered", () => {
       event.register("CHLOE")
-      expect(event.getUserStatus("CHLOE")).toStrictEqual("confirmed")
+      expect(event.getParticipantStatus("CHLOE")).toStrictEqual("confirmed")
       event.withdraw("CHLOE")
-      expect(event.getUserStatus("BOB")).toStrictEqual("unregistered")
+      expect(event.getParticipantStatus("BOB")).toStrictEqual("unregistered")
     })
 
     test("A participant can't withdraw from an event they're not registered to", () => {

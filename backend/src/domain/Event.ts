@@ -37,7 +37,7 @@ export class Event {
     this.participants.push(participantId)
   }
 
-  getUserStatus(participantId: ParticipantId): RegistrationStatus {
+  getParticipantStatus(participantId: ParticipantId): RegistrationStatus {
     const rank = this.findParticipantRank(participantId)
     if (rank === -1) {
       return "unregistered"
