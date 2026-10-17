@@ -1,23 +1,30 @@
 import { describe, expect, test, beforeEach } from "vitest"
-import { CreationData as EventCreationData, Event, InvalidDateError, InvalidCapacityError, MultipleRegistrationError } from './Event.js'
+import { CreationData as EventCreationData, Event, InvalidDateError, InvalidCapacityError, MultipleRegistrationError, RegistrationError } from './Event.js'
 
 describe("Event", () => {
-  test("Event capacity can't be negative", () => {
-    const creationData = {
-      capacity: -1,
-      date: new Date("2026-02-02")
-    }
-    const createEvent = () => new Event(creationData, new Date("2026-01-01"))
-    expect(createEvent).toThrow(InvalidCapacityError)
-  })
-  test("Event must be created in the future", () => {
-    const now = new Date("2022-03-12")
-    const creationData: EventCreationData = {
-      capacity: 10,
-      date: new Date("2022-03-11")
-    }
-    const createEvent = () => new Event(creationData, now)
-    expect(createEvent).toThrow(InvalidDateError)
+
+  const NOW = new Date("2026-01-01")
+  const PAST = new Date("2022-03-11")
+  const FUTURE = new Date("2026-02-02")
+
+  describe("Creation", () => {
+
+    test("Event capacity can't be negative", () => {
+      const creationData = {
+        capacity: -1,
+        date: FUTURE
+      }
+      const createEvent = () => new Event(creationData, NOW)
+      expect(createEvent).toThrow(InvalidCapacityError)
+    })
+    test("Event must be created in the future", () => {
+      const creationData: EventCreationData = {
+        capacity: 10,
+        date: PAST
+      }
+      const createEvent = () => new Event(creationData, NOW)
+      expect(createEvent).toThrow(InvalidDateError)
+    })
   })
 
   describe("Registration", () => {
@@ -88,5 +95,6 @@ describe("Event", () => {
       const unexpectedWithdrawal = () => event.withdraw("ALICE")
       expect(unexpectedWithdrawal).toThrow(RegistrationError)
     })
+
   })
 })
