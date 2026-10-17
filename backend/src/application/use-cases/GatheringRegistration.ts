@@ -1,3 +1,4 @@
+import { GatheringNotFoundError } from "../errors.js"
 import { Clock } from "../ports/Clock.js";
 import { GatheringRepository } from "../ports/GatheringRepository.js"
 
@@ -16,7 +17,7 @@ export class GatheringRegistration {
   async execute(payload: GatheringRegistrationPayload) {
     const gathering = await this.deps.repository.findById(payload.gatheringId)
     if (!gathering) {
-      throw new Error(`Gathering ${payload.gatheringId} not found`)
+      throw new GatheringNotFoundError(payload.gatheringId)
     }
     gathering.register(payload.usedId, this.deps.clock.now())
     await this.deps.repository.save(gathering)

@@ -3,6 +3,7 @@ import { Gathering, CreationData, UnauthorizedDescriptionModification, Unauthori
 import { InMemoryGatheringRepository } from "../../infra/persistence/GatheringRepositoryInMemory.js"
 import { GatheringModification } from "./GatheringModification.js"
 import { GatheringRepository } from "../ports/GatheringRepository.js"
+import { GatheringNotFoundError } from "../errors.js"
 
 describe("Modify Gathering", () => {
   let gathering: Gathering
@@ -83,5 +84,15 @@ describe("Modify Gathering", () => {
     expect(saved?.getDescription()).toStrictEqual(creationData.description)
     expect(saved?.getTitle()).toStrictEqual(creationData.title)
     expect(saved?.getCapacity()).toStrictEqual(creationData.capacity)
+  })
+
+  test("Modifying an unknown gathering is rejected", async () => {
+    const gatheringModification = new GatheringModification({ repository: gatheringRepository })
+    await expect(() => gatheringModification.execute({
+      type: "description",
+      content: "A new description",
+      userId: "SAM",
+      gatheringId: "unknown"
+    })).rejects.toThrow(GatheringNotFoundError)
   })
 })

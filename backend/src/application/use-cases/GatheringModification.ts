@@ -1,3 +1,4 @@
+import { GatheringNotFoundError } from "../errors.js"
 import { GatheringRepository } from "../ports/GatheringRepository.js"
 
 type ModificationPaylod =
@@ -26,7 +27,7 @@ export class GatheringModification {
   async execute(payload: GatheringModificationPaylod) {
     const gathering = await this.deps.repository.findById(payload.gatheringId)
     if (!gathering) {
-      throw new Error(`Gathering ${payload.gatheringId} not found`)
+      throw new GatheringNotFoundError(payload.gatheringId)
     }
     switch (payload.type) {
       case "description": {

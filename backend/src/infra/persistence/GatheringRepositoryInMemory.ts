@@ -9,9 +9,6 @@ export class InMemoryGatheringRepository implements GatheringRepository {
   }
 
   async findById(id: string): Promise<Gathering | undefined> {
-    if (!this.gatherings.has(id)) {
-      throw new Error("Gathering Not Found")
-    }
     return this.gatherings.get(id)
   }
 }
