@@ -5,6 +5,7 @@ import { InvalidCapacityCreationError } from "../../domain/Capacity.js"
 import {
   InvalidCapacityModificationError,
   InvalidDateError,
+  MultipleRegistrationError,
   UnauthorizedCapacityModification,
   UnauthorizedDescriptionModification,
   UnauthorizedTitleModification
@@ -18,7 +19,8 @@ function statusFor(error: Error): number {
     || error instanceof UnauthorizedDescriptionModification
     || error instanceof UnauthorizedTitleModification) return 403
   if (error instanceof GatheringNotFoundError) return 404
-  if (error instanceof InvalidCapacityModificationError) return 409
+  if (error instanceof InvalidCapacityModificationError
+    || error instanceof MultipleRegistrationError) return 409
   if (error instanceof InvalidCapacityCreationError
     || error instanceof InvalidDateError) return 422
   return (error as FastifyError).statusCode ?? 500
