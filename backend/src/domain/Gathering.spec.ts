@@ -1,5 +1,6 @@
 import { describe, expect, test, beforeEach } from "vitest"
-import { CreationData as GatheringCreationData, Gathering, InvalidDateError, InvalidCapacityCreationError, MultipleRegistrationError, RegistrationError, UnauthorizedCapacityModification, InvalidCapacityModificationError } from './Gathering.js'
+import { CreationData as GatheringCreationData, Gathering, InvalidDateError, MultipleRegistrationError, RegistrationError, UnauthorizedCapacityModification, InvalidCapacityModificationError } from './Gathering.js'
+import { InvalidCapacityCreationError } from "./Capacity.js"
 
 describe("Gathering", () => {
 
@@ -7,13 +8,20 @@ describe("Gathering", () => {
   const PAST = new Date("2022-03-11")
   const FUTURE = new Date("2026-02-02")
 
+  const defaultCreationData = {
+    title: "A new gathering",
+    description: "Test gathering",
+    id: "1234"
+  }
   describe("Creation", () => {
 
     test("Gathering capacity can't be negative", () => {
       const creationData = {
         capacity: -1,
         date: FUTURE,
-        organizerId: "SAM"
+        organizerId: "SAM",
+        ...defaultCreationData
+
       }
       expect((() => new Gathering(creationData, NOW)))
         .toThrow(InvalidCapacityCreationError)
@@ -22,7 +30,8 @@ describe("Gathering", () => {
       const creationData: GatheringCreationData = {
         capacity: 10,
         date: PAST,
-        organizerId: "SAM"
+        organizerId: "SAM",
+        ...defaultCreationData
       }
       expect((() => new Gathering(creationData, NOW)))
         .toThrow(InvalidDateError)
@@ -37,7 +46,8 @@ describe("Gathering", () => {
       const creationData: GatheringCreationData = {
         capacity: 2,
         date: new Date("2022-03-15"),
-        organizerId: "SAM"
+        organizerId: "SAM",
+        ...defaultCreationData
       }
       now = new Date("2020-12-31")
       gathering = new Gathering(creationData, now)
@@ -135,7 +145,8 @@ describe("Gathering", () => {
       const gathering = new Gathering({
         date: FUTURE,
         capacity: 50,
-        organizerId: "ALICE"
+        organizerId: "ALICE",
+        ...defaultCreationData
       }, NOW)
       gathering.changeCapacity(200, "ALICE")
       expect(gathering.getCapacity()).toStrictEqual(200)
@@ -147,7 +158,8 @@ describe("Gathering", () => {
       const gathering = new Gathering({
         date: FUTURE,
         capacity: capacity,
-        organizerId: "ALICE"
+        organizerId: "ALICE",
+        ...defaultCreationData
       }, NOW)
       const changeCapacity = () => gathering.changeCapacity(200, "BOB")
       expect(changeCapacity).toThrow(UnauthorizedCapacityModification)
@@ -159,7 +171,8 @@ describe("Gathering", () => {
       const gathering = new Gathering({
         date: FUTURE,
         capacity: capacity,
-        organizerId: "ALICE"
+        organizerId: "ALICE",
+        ...defaultCreationData
       }, NOW)
       gathering.register("BOB")
       gathering.register("CHLOE")

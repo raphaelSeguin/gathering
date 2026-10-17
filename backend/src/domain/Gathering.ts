@@ -1,3 +1,4 @@
+import { Capacity } from "./Capacity.js";
 import { AggragateRoot } from "./shared/AggregateRoot.js";
 
 export type CreationData = {
@@ -16,26 +17,31 @@ export type GatheringEvent =
 
 
 export class Gathering extends AggragateRoot<GatheringEvent> {
-  private capacity: number
+  private capacity: Capacity
   private readonly date: Date
   private readonly organizerId: string
   private readonly participants: Array<ParticipantId> = []
 
-  constructor({ capacity, date, organizerId }: CreationData, now: Date) {
+  constructor({ capacity,
+    date,
+    organizerId,
+    id,
+    description,
+    title
+  }: CreationData,
+    now: Date
+  ) {
     super()
-    if (capacity <= 0) {
-      throw new InvalidCapacityCreationError(capacity)
-    }
     if (date <= now) {
       throw new InvalidDateError(date)
     }
-    this.capacity = capacity
+    this.capacity = new Capacity(capacity)
     this.date = date
     this.organizerId = organizerId
   }
 
   getCapacity(): number {
-    return this.capacity
+    return this.capacity.getValue()
   }
 
   getDate(): Date {
@@ -61,7 +67,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     if (rank === -1) {
       return "unregistered"
     }
-    return rank < this.capacity
+    return rank < this.capacity.getValue()
       ? "confirmed"
       : "waitlisted"
   }
@@ -72,7 +78,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
       throw new RegistrationError(`Participant ${participantId} is not registered`)
     }
     this.participants.splice(rank, 1)
-    const promoted = this.participants.at(this.capacity - 1)
+    const promoted = this.participants.at(this.capacity.getValue() - 1)
     if (promoted) {
       this.record({
         type: "participant-promoted",
@@ -88,7 +94,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     if (changedCapacity < this.participants.length) {
       throw new InvalidCapacityModificationError(this.participants.length)
     }
-    this.capacity = changedCapacity
+    this.capacity = new Capacity(changedCapacity)
   }
 
   private findParticipantRank(participantId: ParticipantId): number {
@@ -96,12 +102,6 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   }
 }
 
-export class InvalidCapacityCreationError extends Error {
-  constructor(capacity: number) {
-    super(`Event capacity can't be negative or null : ${capacity} is invalid`)
-    this.name = "InvalidCapacityCreationError"
-  }
-}
 
 export class InvalidDateError extends Error {
   constructor(date: Date) {
