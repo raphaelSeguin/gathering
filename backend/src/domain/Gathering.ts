@@ -70,7 +70,11 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   }
 
   getParticipants(): string[] {
-    return this.participants
+    return this.participants.slice(0, this.capacity.getValue())
+  }
+
+  getWaitlist(): string[] {
+    return this.participants.slice(this.capacity.getValue())
   }
 
   register(participantId: ParticipantId, now: Date) {

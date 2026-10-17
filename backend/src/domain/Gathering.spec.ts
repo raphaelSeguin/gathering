@@ -67,6 +67,15 @@ describe("Gathering", () => {
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
     })
 
+    test("Participants are the confirmed ones, the waitlist keeps the others in order", () => {
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
+      gathering.register("DENIS", NOW)
+      expect(gathering.getParticipants()).toStrictEqual(["ALICE", "BOB"])
+      expect(gathering.getWaitlist()).toStrictEqual(["CHLOE", "DENIS"])
+    })
+
     test("A participant can't register twice", () => {
       gathering.register("ALICE", NOW)
       const doubleRegistration = () => gathering.register("ALICE", NOW)
