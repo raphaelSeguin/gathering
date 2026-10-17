@@ -2,13 +2,23 @@ import { FastifyError, FastifyReply, FastifyRequest } from "fastify"
 import { z, ZodError } from "zod"
 import { GatheringNotFoundError } from "../../application/errors.js"
 import { InvalidCapacityCreationError } from "../../domain/Capacity.js"
-import { InvalidDateError } from "../../domain/Gathering.js"
+import {
+  InvalidCapacityModificationError,
+  InvalidDateError,
+  UnauthorizedCapacityModification,
+  UnauthorizedDescriptionModification,
+  UnauthorizedTitleModification
+} from "../../domain/Gathering.js"
 import { MissingUserError } from "./currentUser.js"
 
 function statusFor(error: Error): number {
   if (error instanceof ZodError) return 400
   if (error instanceof MissingUserError) return 401
+  if (error instanceof UnauthorizedCapacityModification
+    || error instanceof UnauthorizedDescriptionModification
+    || error instanceof UnauthorizedTitleModification) return 403
   if (error instanceof GatheringNotFoundError) return 404
+  if (error instanceof InvalidCapacityModificationError) return 409
   if (error instanceof InvalidCapacityCreationError
     || error instanceof InvalidDateError) return 422
   return (error as FastifyError).statusCode ?? 500
