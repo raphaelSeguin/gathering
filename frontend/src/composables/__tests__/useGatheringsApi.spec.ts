@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useGatheringsApi } from '../useGatheringsApi'
 import { request } from '@/api/client'
 
-vi.mock('@/api/client', () => ({ request: vi.fn() }))
+vi.mock('@/api/client', () => ({ request: vi.fn<typeof request>() }))
 
 describe('useGatheringsApi', () => {
   const requestMock = vi.mocked(request)

@@ -10,7 +10,7 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 describe('api client', () => {
-  const fetchMock = vi.fn()
+  const fetchMock = vi.fn<typeof fetch>()
 
   beforeEach(() => {
     sessionStorage.clear()
