@@ -136,8 +136,16 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     if (userId !== this.organizerId) {
       throw new UnauthorizedCapacityModification()
     }
-    if (changedCapacity < this.participants.length) {
+    if (changedCapacity < this.capacity.getValue()) {
       throw new InvalidCapacityModificationError(this.participants.length)
+    }
+
+    // all participants from this.capacity to changedCApacity - 1 get promoted
+    for (let i = this.capacity.getValue(); i < Math.min(changedCapacity, this.participants.length); i += 1) {
+      this.record({
+        type: "participant-promoted",
+        participantId: this.participants[i]!
+      })
     }
     this.capacity = new Capacity(changedCapacity)
   }
@@ -222,6 +230,6 @@ export class UnauthorizedTitleModification extends Error {
 export class InvalidCapacityModificationError extends Error {
   constructor(participantsCount: number) {
     super(`Capacity must be at least the number of participants (${participantsCount})`)
-    this.name = "InvalidCapacityCreationError"
+    this.name = "InvalidCapacityModificationError"
   }
 }

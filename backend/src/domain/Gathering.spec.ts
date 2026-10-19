@@ -164,7 +164,24 @@ describe("Gathering", () => {
       })
     })
 
-    test.todo("When capacity is augmented promotion events are sent")
+    test("When capacity is augmented promotion events are sent", () => {
+      gathering.register("ALICE", NOW)
+      gathering.register("BOB", NOW)
+      gathering.register("CHLOE", NOW)
+      gathering.register("DENIS", NOW)
+      gathering.register("ERIC", NOW)
+      gathering.changeCapacity(4, "SAM")
+      const domainEvents = gathering.pullDomainEvents()
+      expect(domainEvents).toContainEqual({
+        type: "participant-promoted",
+        participantId: "CHLOE"
+      })
+      expect(domainEvents).toContainEqual({
+        type: "participant-promoted",
+        participantId: "DENIS"
+      })
+    })
+
     test.todo("")
 
   })
@@ -220,7 +237,7 @@ describe("Gathering", () => {
       expect(gathering.getDescription()).toStrictEqual(defaultCreationData.description)
     })
 
-    test("The capacity can only be modified to at least the number of already registered participants", () => {
+    test("The capacity can only be modified to greater value", () => {
       const capacity = 50
       const gathering = Gathering.reconstitue({
         date: FUTURE,

@@ -79,10 +79,10 @@ describe("PATCH /api/gatherings/:id", () => {
     expect(response.statusCode).toStrictEqual(409)
   })
 
-  test("responds 422 for a capacity below two", async () => {
+  test("responds 409 for a capacity below two", async () => {
     const response = await modify({ capacity: 1, description: "Another description" })
 
-    expect(response.statusCode).toStrictEqual(422)
+    expect(response.statusCode).toStrictEqual(409)
     const fetched = await app.inject({ method: "GET", url: "/api/gatherings/1234" })
     expect(fetched.json().description).toStrictEqual("Test gathering")
   })
