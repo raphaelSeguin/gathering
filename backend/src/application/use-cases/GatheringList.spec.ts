@@ -16,8 +16,8 @@ describe("Gathering list", () => {
   test("Listing every gathering", async () => {
     const gatheringRepository = new InMemoryGatheringRepository()
     const now = new Date("2020-12-31")
-    await gatheringRepository.save(new Gathering(creationData, now))
-    await gatheringRepository.save(new Gathering({ ...creationData, id: "5678" }, now))
+    await gatheringRepository.save(Gathering.schedule(creationData, now))
+    await gatheringRepository.save(Gathering.schedule({ ...creationData, id: "5678" }, now))
 
     const gatherings = await new GatheringList({ repository: gatheringRepository }).execute()
 

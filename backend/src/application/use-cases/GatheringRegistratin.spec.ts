@@ -20,7 +20,7 @@ describe("Registration to a Gathering", () => {
     id: "1234"
   }
   beforeEach(async () => {
-    gathering = new Gathering(creationData, now)
+    gathering = Gathering.schedule(creationData, now)
     now = new Date("2020-12-31")
     gatheringRepository = new InMemoryGatheringRepository()
     await gatheringRepository.save(gathering)

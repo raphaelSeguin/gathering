@@ -28,25 +28,31 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   private description: string
   private title: string
 
-  constructor({ capacity,
+  private constructor({ capacity,
     date,
     organizerId,
     id,
     description,
     title
-  }: CreationData,
-    now: Date
-  ) {
+  }: CreationData) {
     super()
-    if (date <= now) {
-      throw new InvalidDateError(date)
-    }
     this.capacity = new Capacity(capacity)
     this.date = date
     this.organizerId = organizerId
     this.id = id
     this.description = description
     this.title = title
+  }
+
+  static schedule(creationData: CreationData, now: Date) {
+    if (creationData.date <= now) {
+      throw new InvalidDateError(creationData.date)
+    }
+    return new Gathering(creationData)
+  }
+
+  static reconstitue(creationData: CreationData) {
+    return new Gathering(creationData)
   }
 
   getCapacity(): number {
@@ -86,7 +92,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
       throw new MultipleRegistrationError(participantId)
     }
     if (now > this.date) {
-      throw new Error("")
+      throw new LateRegistrationError()
     }
     const eventType: GatheringEvent["type"] = this.participants.length < this.capacity.getValue()
       ? "participant-registered"
@@ -108,10 +114,13 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
       : "waitlisted"
   }
 
-  withdraw(participantId: ParticipantId): void {
+  withdraw(participantId: ParticipantId, now: Date): void {
     const rank = this.findParticipantRank(participantId)
     if (rank === -1) {
       throw new RegistrationError(`Participant ${participantId} is not registered`)
+    }
+    if (now > this.date) {
+      throw new LateWithdrawalError()
     }
     this.participants.splice(rank, 1)
     const promoted = this.participants.at(this.capacity.getValue() - 1)
@@ -174,6 +183,20 @@ export class RegistrationError extends Error {
   }
 }
 
+export class LateRegistrationError extends Error {
+  constructor() {
+    super(`Registration must happen before the gathering`)
+    this.name = "LateRegistrationError"
+  }
+}
+
+export class LateWithdrawalError extends Error {
+  constructor() {
+    super(`Withdrawal must happen before the gathering`)
+    this.name = "LateWithdrawalError"
+  }
+}
+
 export class UnauthorizedCapacityModification extends Error {
   constructor() {
     super(`Only the organizer can change capacity`)
@@ -195,7 +218,6 @@ export class UnauthorizedTitleModification extends Error {
     this.name = "UnauthorizedTitleModification"
   }
 }
-
 
 export class InvalidCapacityModificationError extends Error {
   constructor(participantsCount: number) {

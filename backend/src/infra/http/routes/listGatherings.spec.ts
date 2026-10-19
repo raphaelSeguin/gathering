@@ -20,10 +20,10 @@ describe("GET /api/gatherings", () => {
 
   beforeEach(async () => {
     const repository = new InMemoryGatheringRepository()
-    const registered = new Gathering(creationData, NOW)
+    const registered = Gathering.schedule(creationData, NOW)
     registered.register("ALICE", NOW)
     await repository.save(registered)
-    await repository.save(new Gathering({ ...creationData, id: "5678", title: "Another gathering" }, NOW))
+    await repository.save(Gathering.schedule({ ...creationData, id: "5678", title: "Another gathering" }, NOW))
     app = buildApp({ repository, idGenerator: new UUIDGenerator(), clock: new FixedClock(NOW) })
   })
 

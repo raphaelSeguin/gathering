@@ -19,7 +19,7 @@ describe("Gathering details", () => {
 
   beforeEach(async () => {
     gatheringRepository = new InMemoryGatheringRepository()
-    await gatheringRepository.save(new Gathering(creationData, new Date("2020-12-31")))
+    await gatheringRepository.save(Gathering.schedule(creationData, new Date("2020-12-31")))
   })
 
   test("Retrieving a gathering by its id", async () => {

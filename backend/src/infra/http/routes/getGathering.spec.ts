@@ -12,7 +12,7 @@ describe("GET /api/gatherings/:id", () => {
 
   beforeEach(async () => {
     const repository = new InMemoryGatheringRepository()
-    const gathering = new Gathering({
+    const gathering = Gathering.schedule({
       id: "1234",
       title: "A new gathering",
       description: "Test gathering",

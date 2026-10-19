@@ -13,7 +13,7 @@ describe("PATCH /api/gatherings/:id", () => {
 
   beforeEach(async () => {
     const repository = new InMemoryGatheringRepository()
-    gathering = new Gathering({
+    gathering = Gathering.schedule({
       id: "1234",
       title: "A new gathering",
       description: "Test gathering",

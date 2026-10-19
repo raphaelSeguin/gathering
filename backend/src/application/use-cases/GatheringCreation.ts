@@ -32,7 +32,7 @@ export class GatheringCreation {
     const id = this.deps.idGenerator.nextId()
     const now = this.deps.clock.now()
 
-    const gathering = new Gathering({
+    const gathering = Gathering.schedule({
       organizerId,
       capacity,
       date,

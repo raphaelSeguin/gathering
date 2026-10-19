@@ -12,7 +12,7 @@ describe("POST /api/gatherings/:id/registrations", () => {
 
   beforeEach(async () => {
     const repository = new InMemoryGatheringRepository()
-    await repository.save(new Gathering({
+    await repository.save(Gathering.schedule({
       id: "1234",
       title: "A new gathering",
       description: "Test gathering",
