@@ -137,7 +137,7 @@ describe("Gathering", () => {
     test("Once a participant is registered, an event is emitted", () => {
       gathering.register("ALICE", NOW)
       expect(gathering.pullDomainEvents()).toContainEqual({
-        type: "participant-registered",
+        type: "participant-confirmed",
         participantId: "ALICE"
       })
     })
@@ -180,6 +180,8 @@ describe("Gathering", () => {
         type: "participant-promoted",
         participantId: "DENIS"
       })
+      expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("confirmed")
+      expect(gathering.getParticipantStatus("DENIS")).toStrictEqual("confirmed")
     })
 
     test.todo("")

@@ -14,7 +14,7 @@ export type ParticipantId = string;
 export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
 
 export type GatheringEvent =
-  | { type: "participant-registered", participantId: ParticipantId }
+  | { type: "participant-confirmed", participantId: ParticipantId }
   | { type: "participant-waitlisted", participantId: ParticipantId }
   | { type: "participant-promoted", participantId: ParticipantId }
 
@@ -95,7 +95,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
       throw new LateRegistrationError()
     }
     const eventType: GatheringEvent["type"] = this.participants.length < this.capacity.getValue()
-      ? "participant-registered"
+      ? "participant-confirmed"
       : "participant-waitlisted"
     this.record({
       type: eventType,
