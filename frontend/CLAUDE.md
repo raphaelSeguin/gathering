@@ -1,8 +1,8 @@
 # Frontend
 
 ## Commandes
-- `npm run dev` : serveur de développement
-- `npm test` : tests Vitest
+- `pnpm run dev` : serveur de développement
+- `pnpm test` : tests Vitest
 
 ## Conventions
 - Vue 3, Composition API, `<script setup lang="ts">`.
