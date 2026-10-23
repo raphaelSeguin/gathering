@@ -20,6 +20,7 @@ export class GatheringWithdrawal {
       throw new GatheringNotFoundError(payload.gatheringId)
     }
     gathering.withdraw(payload.userId, this.deps.clock.now())
+    console.log(gathering.pullDomainEvents())
     await this.deps.repository.save(gathering)
   }
 }

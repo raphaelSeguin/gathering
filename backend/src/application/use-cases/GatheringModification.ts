@@ -43,6 +43,7 @@ export class GatheringModification {
         break
       }
     }
+    console.log(gathering.pullDomainEvents())
     await this.deps.repository.save(gathering)
   }
 }

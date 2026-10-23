@@ -22,6 +22,7 @@ export class GatheringRegistration {
     }
     gathering.register(payload.userId, this.deps.clock.now())
     await this.deps.repository.save(gathering)
+    console.log(gathering.pullDomainEvents())
     return gathering.getParticipantStatus(payload.userId)
   }
 }
