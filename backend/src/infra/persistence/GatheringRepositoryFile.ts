@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises"
+import { readFile, writeFile } from "node:fs/promises"
 import { GatheringRepository } from "../../application/ports/GatheringRepository.js"
 import { Gathering } from "../../domain/Gathering.js"
 
@@ -15,8 +15,8 @@ type GatheringRecord = {
 export class FileGatheringRepository implements GatheringRepository {
   constructor(private readonly filePath: string) { }
 
-  async save(_gathering: Gathering): Promise<void> {
-    throw new Error("Not implemented yet")
+  async save(gathering: Gathering): Promise<void> {
+    await this.writeRecords([toRecord(gathering)])
   }
 
   async findById(id: string): Promise<Gathering | undefined> {
@@ -37,6 +37,22 @@ export class FileGatheringRepository implements GatheringRepository {
       }
       throw error
     }
+  }
+
+  private async writeRecords(records: GatheringRecord[]): Promise<void> {
+    await writeFile(this.filePath, JSON.stringify(records))
+  }
+}
+
+function toRecord(gathering: Gathering): GatheringRecord {
+  return {
+    id: gathering.getId(),
+    title: gathering.getTitle(),
+    description: gathering.getDescription(),
+    date: gathering.getDate().toISOString(),
+    capacity: gathering.getCapacity(),
+    organizerId: gathering.getOrganizerId(),
+    participants: gathering.getParticipants()
   }
 }
 
