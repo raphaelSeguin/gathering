@@ -48,7 +48,7 @@ export class FileGatheringRepository implements GatheringRepository {
   }
 
   private async writeRecords(records: GatheringRecord[]): Promise<void> {
-    await writeFile(this.filePath, JSON.stringify(records))
+    await writeFile(this.filePath, JSON.stringify(records, null, 2) + "\n")
   }
 }
 

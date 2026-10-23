@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest"
-import { mkdtemp, rm } from "node:fs/promises"
+import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Gathering } from "../../domain/Gathering.js"
@@ -61,6 +61,27 @@ describe("FileGatheringRepository", () => {
     const all = await repository.findAll()
     expect(all.map((g) => g.getId())).toStrictEqual(["1234", "5678"])
     expect(all[0]?.getParticipants()).toStrictEqual(["ALICE"])
+  })
+
+  test("writes a formatted json file", async () => {
+    await new FileGatheringRepository(filePath).save(gathering("1234", ["ALICE"]))
+
+    const content = await readFile(filePath, "utf8")
+
+    expect(content).toStrictEqual(`[
+  {
+    "id": "1234",
+    "title": "A new gathering",
+    "description": "Test gathering",
+    "date": "2026-02-02T18:00:00.000Z",
+    "capacity": 2,
+    "organizerId": "SAM",
+    "participants": [
+      "ALICE"
+    ]
+  }
+]
+`)
   })
 })
 
