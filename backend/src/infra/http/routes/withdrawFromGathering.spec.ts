@@ -50,4 +50,10 @@ describe("DELETE /api/gatherings/:id/registrations", () => {
     })
     expect(details.json()).toMatchObject({ myStatus: "unregistered", participantCount: 0 })
   })
+
+  test("responds 401 without a current user", async () => {
+    const response = await withdraw("")
+
+    expect(response.statusCode).toStrictEqual(401)
+  })
 })
