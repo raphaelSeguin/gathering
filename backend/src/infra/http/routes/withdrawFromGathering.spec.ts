@@ -56,4 +56,11 @@ describe("DELETE /api/gatherings/:id/registrations", () => {
 
     expect(response.statusCode).toStrictEqual(401)
   })
+
+  test("responds 404 for an unknown gathering", async () => {
+    const response = await withdraw("ALICE", "unknown")
+
+    expect(response.statusCode).toStrictEqual(404)
+    expect(response.json()).toStrictEqual({ message: "Gathering unknown not found" })
+  })
 })
