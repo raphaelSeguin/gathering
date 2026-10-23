@@ -3,7 +3,8 @@ import { computed } from 'vue'
 import type { GatheringDto } from '@/api/types'
 import StatusBadge from './StatusBadge.vue'
 
-const props = defineProps<{ gathering: GatheringDto }>()
+const props = defineProps<{ gathering: GatheringDto; withdrawable?: boolean }>()
+const emit = defineEmits<{ withdraw: [id: string] }>()
 
 const formattedDate = computed(() =>
   new Date(props.gathering.date).toLocaleString(undefined, {
@@ -25,8 +26,16 @@ const formattedDate = computed(() =>
       · {{ gathering.participantCount }} / {{ gathering.capacity }} registered
     </p>
     <p>{{ gathering.description }}</p>
-    <div v-if="$slots.default" class="card__actions">
+    <div v-if="$slots.default || withdrawable" class="card__actions">
       <slot />
+      <button
+        v-if="withdrawable"
+        type="button"
+        :aria-label="`Withdraw from ${gathering.title}`"
+        @click="emit('withdraw', gathering.id)"
+      >
+        withdraw
+      </button>
     </div>
   </article>
 </template>

@@ -47,4 +47,21 @@ describe('GatheringCard', () => {
 
     expect(wrapper.get('button').text()).toBe('Register')
   })
+
+  it('shows no withdraw button by default', () => {
+    const wrapper = mount(GatheringCard, { props: { gathering } })
+
+    expect(wrapper.find('button').exists()).toBe(false)
+  })
+
+  it('emits withdraw with the gathering id when the withdraw button is clicked', async () => {
+    const wrapper = mount(GatheringCard, { props: { gathering, withdrawable: true } })
+
+    const button = wrapper.get('button')
+    expect(button.text()).toBe('withdraw')
+    expect(button.attributes('aria-label')).toBe('Withdraw from Vue meetup')
+    await button.trigger('click')
+
+    expect(wrapper.emitted('withdraw')).toEqual([[gathering.id]])
+  })
 })
