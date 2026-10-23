@@ -80,6 +80,13 @@ export const useGatheringsStore = defineStore('gatherings', () => {
     })
   }
 
+  function withdraw(id: string) {
+    return run(async () => {
+      await api.withdraw(id)
+      upsert(await api.get(id))
+    })
+  }
+
   function create(payload: GatheringCreationPayload) {
     return run(async () => {
       upsert(await api.create(payload))
@@ -104,6 +111,7 @@ export const useGatheringsStore = defineStore('gatherings', () => {
     fetchAll,
     fetchOne,
     register,
+    withdraw,
     create,
     updateCapacity,
   }

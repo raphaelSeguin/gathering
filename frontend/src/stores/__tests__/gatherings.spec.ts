@@ -106,6 +106,32 @@ describe('gatherings store — actions', () => {
     expect(store.error).toBe('Already registered')
   })
 
+  it('withdraws: refreshes the gathering so it leaves my registrations', async () => {
+    api.withdraw.mockResolvedValue(undefined)
+    api.get.mockResolvedValue(aGathering({ id: 'a', myStatus: 'unregistered', participantCount: 9 }))
+    const store = useGatheringsStore()
+    store.items = [aGathering({ id: 'a', myStatus: 'confirmed', participantCount: 10 })]
+
+    const success = await store.withdraw('a')
+
+    expect(success).toBe(true)
+    expect(api.withdraw).toHaveBeenCalledWith('a')
+    expect(store.joined).toEqual([])
+    expect(store.items[0]).toMatchObject({ myStatus: 'unregistered', participantCount: 9 })
+  })
+
+  it('keeps the gathering in my registrations when withdrawal fails', async () => {
+    api.withdraw.mockRejectedValue(new ApiError('Not registered', 409))
+    const store = useGatheringsStore()
+    store.items = [aGathering({ id: 'a', myStatus: 'confirmed' })]
+
+    const success = await store.withdraw('a')
+
+    expect(success).toBe(false)
+    expect(store.joined.map((g) => g.id)).toEqual(['a'])
+    expect(store.error).toBe('Not registered')
+  })
+
   it('creates a gathering and reports success', async () => {
     const created = aGathering({ id: 'new', organizerId: 'alice' })
     api.create.mockResolvedValue(created)
