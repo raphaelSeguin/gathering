@@ -10,5 +10,6 @@ export function useGatheringsApi() {
     updateCapacity: (id: string, capacity: number) =>
       request<GatheringDto>('PATCH', `/gatherings/${id}`, { capacity }),
     register: (id: string) => request<RegistrationResult>('POST', `/gatherings/${id}/registrations`),
+    withdraw: (id: string) => request<void>('DELETE', `/gatherings/${id}/registrations`),
   }
 }

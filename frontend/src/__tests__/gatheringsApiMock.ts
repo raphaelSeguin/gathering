@@ -11,6 +11,7 @@ const api = {
   create: vi.fn<GatheringsApi['create']>(),
   updateCapacity: vi.fn<GatheringsApi['updateCapacity']>(),
   register: vi.fn<GatheringsApi['register']>(),
+  withdraw: vi.fn<GatheringsApi['withdraw']>(),
 }
 
 export const useGatheringsApi = () => api

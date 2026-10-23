@@ -49,4 +49,10 @@ describe('useGatheringsApi', () => {
     expect(requestMock).toHaveBeenCalledWith('POST', '/gatherings/42/registrations')
     expect(result).toEqual({ status: 'waitlisted' })
   })
+
+  it('withdraws from a gathering', async () => {
+    await useGatheringsApi().withdraw('42')
+
+    expect(requestMock).toHaveBeenCalledWith('DELETE', '/gatherings/42/registrations')
+  })
 })
