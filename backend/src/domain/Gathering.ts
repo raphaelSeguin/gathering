@@ -1,6 +1,9 @@
 import { Capacity } from "./Capacity.js";
 import { AggragateRoot } from "./shared/AggregateRoot.js";
 
+export type ParticipantId = string;
+export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
+
 export type CreationData = {
   readonly capacity: number;
   readonly date: Date;
@@ -10,8 +13,7 @@ export type CreationData = {
   readonly title: string;
 }
 
-export type ParticipantId = string;
-export type RegistrationStatus = "unregistered" | "confirmed" | "waitlisted"
+export type ReconstitutionData = CreationData & { participantsIds?: Array<ParticipantId> }
 
 export type GatheringEvent =
   | { type: "participant-confirmed", participantId: ParticipantId }
@@ -33,7 +35,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     organizerId,
     id,
     description,
-    title
+    title,
   }: CreationData) {
     super()
     this.capacity = new Capacity(capacity)
@@ -51,8 +53,10 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     return new Gathering(creationData)
   }
 
-  static reconstitue(creationData: CreationData) {
-    return new Gathering(creationData)
+  static reconstitue(reconstitutionData: ReconstitutionData) {
+    const gathering = new Gathering(reconstitutionData)
+    gathering.participants.push(...(reconstitutionData.participantsIds ?? []))
+    return gathering
   }
 
   getCapacity(): number {

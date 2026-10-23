@@ -46,6 +46,18 @@ describe("Gathering", () => {
       }, NOW)
       expect(gathering.getOrganizerId()).toStrictEqual("SAM")
     })
+    test("Reconstitution restores participants without events", () => {
+      const gathering = Gathering.reconstitue({
+        capacity: 2,
+        date: PAST,
+        organizerId: "SAM",
+        participantsIds: ["ALICE", "BOB", "CHLOE"],
+        ...defaultCreationData
+      })
+      expect(gathering.getParticipants()).toStrictEqual(["ALICE", "BOB", "CHLOE"])
+      expect(gathering.getWaitlist()).toStrictEqual(["CHLOE"])
+      expect(gathering.pullDomainEvents()).toStrictEqual([])
+    })
   })
 
   describe("Registration", () => {
