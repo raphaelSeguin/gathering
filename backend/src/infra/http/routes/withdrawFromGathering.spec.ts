@@ -9,9 +9,10 @@ import { buildApp } from "../app.js"
 describe("DELETE /api/gatherings/:id/registrations", () => {
   const NOW = new Date("2026-01-01T00:00:00.000Z")
   let app: FastifyInstance
+  let repository: InMemoryGatheringRepository
 
   beforeEach(async () => {
-    const repository = new InMemoryGatheringRepository()
+    repository = new InMemoryGatheringRepository()
     await repository.save(Gathering.schedule({
       id: "1234",
       title: "A new gathering",
@@ -69,5 +70,22 @@ describe("DELETE /api/gatherings/:id/registrations", () => {
 
     expect(response.statusCode).toStrictEqual(404)
     expect(response.json()).toStrictEqual({ message: "Participant ALICE is not registered" })
+  })
+
+  test("responds 409 once the gathering date is passed", async () => {
+    await register("ALICE")
+    const lateApp = buildApp({
+      repository,
+      idGenerator: new UUIDGenerator(),
+      clock: new FixedClock(new Date("2026-02-03T00:00:00.000Z"))
+    })
+
+    const response = await lateApp.inject({
+      method: "DELETE",
+      url: "/api/gatherings/1234/registrations",
+      headers: { "x-user-id": "ALICE" }
+    })
+
+    expect(response.statusCode).toStrictEqual(409)
   })
 })
