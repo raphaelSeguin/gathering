@@ -47,6 +47,18 @@ describe('api client', () => {
     expect(new Headers(init.headers).get('Content-Type')).toBe('application/json')
   })
 
+  it('resolves to undefined on a 204 DELETE response', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }))
+
+    const result = await request('DELETE', '/gatherings/1/registrations')
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/gatherings/1/registrations',
+      expect.objectContaining({ method: 'DELETE' }),
+    )
+    expect(result).toBeUndefined()
+  })
+
   it('throws an ApiError with the server message on a non-2xx response', async () => {
     fetchMock.mockResolvedValue(jsonResponse(400, { message: 'Capacity must be at least 3' }))
 

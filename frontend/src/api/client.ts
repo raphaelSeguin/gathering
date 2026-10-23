@@ -2,7 +2,7 @@ import { useSession } from '@/composables/useSession'
 
 const BASE_URL = '/api'
 
-type HttpMethod = 'GET' | 'POST' | 'PATCH'
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
 export class ApiError extends Error {
   constructor(
