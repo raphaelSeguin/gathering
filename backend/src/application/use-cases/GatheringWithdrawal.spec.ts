@@ -4,6 +4,7 @@ import { InMemoryGatheringRepository } from "../../infra/persistence/GatheringRe
 import { GatheringRepository } from "../ports/GatheringRepository.js"
 import { GatheringWithdrawal } from "./GatheringWithdrawal.js"
 import { FixedClock } from "../../infra/Clock.js"
+import { GatheringNotFoundError } from "../errors.js"
 
 describe("Withdrawal from a Gathering", () => {
   let gathering: Gathering
@@ -36,5 +37,16 @@ describe("Withdrawal from a Gathering", () => {
     })
     const savedGathering = await gatheringRepository.findById("1234")
     expect(savedGathering?.getParticipants()).toStrictEqual([])
+  })
+
+  test("Withdrawing from an unknown gathering is rejected", async () => {
+    const gatheringWithdrawal = new GatheringWithdrawal({
+      repository: gatheringRepository,
+      clock: new FixedClock(new Date("2022-03-10"))
+    })
+    await expect(() => gatheringWithdrawal.execute({
+      userId: "ALICE",
+      gatheringId: "unknown"
+    })).rejects.toThrow(GatheringNotFoundError)
   })
 })
