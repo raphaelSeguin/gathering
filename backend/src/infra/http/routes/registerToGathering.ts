@@ -12,7 +12,7 @@ export function registerToGatheringRoute(
   app.post("/gatherings/:id/registrations", async (request, reply) => {
     const userId = requireUserId(request)
     const { id } = paramsSchema.parse(request.params)
-    const status = await deps.gatheringRegistration.execute({ usedId: userId, gatheringId: id })
+    const status = await deps.gatheringRegistration.execute({ userId: userId, gatheringId: id })
     return reply.status(201).send({ status })
   })
 }

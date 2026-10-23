@@ -32,7 +32,7 @@ describe("Registration to a Gathering", () => {
       clock: new FixedClock(new Date("2022-03-01"))
     })
     await gatheringRegistration.execute({
-      usedId: "ALICE",
+      userId: "ALICE",
       gatheringId: "1234"
     })
     const savedGathering = await gatheringRepository.findById("1234")
@@ -46,7 +46,7 @@ describe("Registration to a Gathering", () => {
       clock: new FixedClock(new Date("2022-03-16"))
     })
     await expect(() => gatheringRegistration.execute({
-      usedId: "ALICE",
+      userId: "ALICE",
       gatheringId: "1234"
     })).rejects.toThrow()
     const savedGathering = await gatheringRepository.findById("1234")
@@ -60,7 +60,7 @@ describe("Registration to a Gathering", () => {
       clock: new FixedClock(new Date("2022-03-01"))
     })
     await expect(() => gatheringRegistration.execute({
-      usedId: "ALICE",
+      userId: "ALICE",
       gatheringId: "unknown"
     })).rejects.toThrow(GatheringNotFoundError)
   })
@@ -70,7 +70,7 @@ describe("Registration to a Gathering", () => {
       repository: gatheringRepository,
       clock: new FixedClock(new Date("2022-03-01"))
     })
-    const register = (usedId: string) => gatheringRegistration.execute({ usedId, gatheringId: "1234" })
+    const register = (userId: string) => gatheringRegistration.execute({ userId: userId, gatheringId: "1234" })
     expect(await register("ALICE")).toStrictEqual("confirmed")
     expect(await register("BOB")).toStrictEqual("confirmed")
     expect(await register("CHLOE")).toStrictEqual("waitlisted")

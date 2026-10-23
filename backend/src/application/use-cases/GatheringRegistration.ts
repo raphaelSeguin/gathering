@@ -9,7 +9,7 @@ type GatheringRegistrationDependencies = {
 }
 
 type GatheringRegistrationPayload = {
-  usedId: string;
+  userId: string;
   gatheringId: string;
 }
 
@@ -20,8 +20,8 @@ export class GatheringRegistration {
     if (!gathering) {
       throw new GatheringNotFoundError(payload.gatheringId)
     }
-    gathering.register(payload.usedId, this.deps.clock.now())
+    gathering.register(payload.userId, this.deps.clock.now())
     await this.deps.repository.save(gathering)
-    return gathering.getParticipantStatus(payload.usedId)
+    return gathering.getParticipantStatus(payload.userId)
   }
 }
