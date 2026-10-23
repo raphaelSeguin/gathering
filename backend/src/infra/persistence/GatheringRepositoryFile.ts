@@ -17,7 +17,14 @@ export class FileGatheringRepository implements GatheringRepository {
 
   async save(gathering: Gathering): Promise<void> {
     const records = await this.readRecords()
-    await this.writeRecords([...records, toRecord(gathering)])
+    const record = toRecord(gathering)
+    const index = records.findIndex((r) => r.id === record.id)
+    if (index === -1) {
+      records.push(record)
+    } else {
+      records[index] = record
+    }
+    await this.writeRecords(records)
   }
 
   async findById(id: string): Promise<Gathering | undefined> {

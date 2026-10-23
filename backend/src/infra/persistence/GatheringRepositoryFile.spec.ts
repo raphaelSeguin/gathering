@@ -48,6 +48,20 @@ describe("FileGatheringRepository", () => {
 
     expect(ids).toStrictEqual(["1234", "5678"])
   })
+
+  test("replaces a gathering saved again", async () => {
+    const repository = new FileGatheringRepository(filePath)
+    await repository.save(gathering("1234"))
+    await repository.save(gathering("5678"))
+    const changed = await repository.findById("1234")
+    changed!.register("ALICE", new Date("2026-01-01T00:00:00.000Z"))
+
+    await repository.save(changed!)
+
+    const all = await repository.findAll()
+    expect(all.map((g) => g.getId())).toStrictEqual(["1234", "5678"])
+    expect(all[0]?.getParticipants()).toStrictEqual(["ALICE"])
+  })
 })
 
 function gathering(id: string, participantsIds: string[] = []): Gathering {
