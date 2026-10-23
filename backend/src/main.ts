@@ -6,10 +6,12 @@ import { InMemoryGatheringRepository } from "./infra/persistence/GatheringReposi
 
 const DEMO_FILE = "demo-gatherings.json"
 
+const gatheringRepository = process.env.DEMO
+  ? new FileGatheringRepository(DEMO_FILE)
+  : new InMemoryGatheringRepository()
+
 const app = buildApp({
-  repository: process.env.DEMO
-    ? new FileGatheringRepository(DEMO_FILE)
-    : new InMemoryGatheringRepository(),
+  repository: gatheringRepository,
   idGenerator: new UUIDGenerator(),
   clock: new SystemClock()
 })
