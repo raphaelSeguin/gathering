@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "vitest"
-import { CreationData, Gathering, LateWithdrawalError } from "../../domain/Gathering.js"
+import { CreationData, Gathering, LateWithdrawalError, RegistrationError } from "../../domain/Gathering.js"
 import { InMemoryGatheringRepository } from "../../infra/persistence/GatheringRepositoryInMemory.js"
 import { GatheringRepository } from "../ports/GatheringRepository.js"
 import { GatheringWithdrawal } from "./GatheringWithdrawal.js"
@@ -62,5 +62,16 @@ describe("Withdrawal from a Gathering", () => {
     })).rejects.toThrow(LateWithdrawalError)
     const savedGathering = await gatheringRepository.findById("1234")
     expect(savedGathering?.getParticipants()).toStrictEqual(["ALICE"])
+  })
+
+  test("Withdrawing without being registered is rejected", async () => {
+    const gatheringWithdrawal = new GatheringWithdrawal({
+      repository: gatheringRepository,
+      clock: new FixedClock(new Date("2022-03-10"))
+    })
+    await expect(() => gatheringWithdrawal.execute({
+      userId: "ALICE",
+      gatheringId: "1234"
+    })).rejects.toThrow(RegistrationError)
   })
 })
