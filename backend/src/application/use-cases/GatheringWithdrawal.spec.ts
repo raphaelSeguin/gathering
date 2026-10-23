@@ -74,4 +74,21 @@ describe("Withdrawal from a Gathering", () => {
       gatheringId: "1234"
     })).rejects.toThrow(RegistrationError)
   })
+
+  test("A confirmed participant withdrawal promotes the first waitlisted participant", async () => {
+    gathering.register("ALICE", registrationDate)
+    gathering.register("BOB", registrationDate)
+    gathering.register("CHLOE", registrationDate)
+    const gatheringWithdrawal = new GatheringWithdrawal({
+      repository: gatheringRepository,
+      clock: new FixedClock(new Date("2022-03-10"))
+    })
+    await gatheringWithdrawal.execute({
+      userId: "ALICE",
+      gatheringId: "1234"
+    })
+    const savedGathering = await gatheringRepository.findById("1234")
+    expect(savedGathering?.getParticipants()).toStrictEqual(["BOB", "CHLOE"])
+    expect(savedGathering?.getWaitlist()).toStrictEqual([])
+  })
 })
