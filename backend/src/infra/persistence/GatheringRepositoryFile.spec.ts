@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest"
-import { mkdtemp, readFile, rm } from "node:fs/promises"
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Gathering } from "../../domain/Gathering.js"
@@ -82,6 +82,17 @@ describe("FileGatheringRepository", () => {
   }
 ]
 `)
+  })
+
+  test("picks up a hand edit of the file", async () => {
+    const repository = new FileGatheringRepository(filePath)
+    await repository.save(gathering("1234"))
+    await repository.findById("1234")
+    const content = await readFile(filePath, "utf8")
+
+    await writeFile(filePath, content.replace("A new gathering", "An edited gathering"))
+
+    expect((await repository.findById("1234"))?.getTitle()).toStrictEqual("An edited gathering")
   })
 })
 
