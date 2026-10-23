@@ -63,4 +63,11 @@ describe("DELETE /api/gatherings/:id/registrations", () => {
     expect(response.statusCode).toStrictEqual(404)
     expect(response.json()).toStrictEqual({ message: "Gathering unknown not found" })
   })
+
+  test("responds 404 when the user is not registered", async () => {
+    const response = await withdraw("ALICE")
+
+    expect(response.statusCode).toStrictEqual(404)
+    expect(response.json()).toStrictEqual({ message: "Participant ALICE is not registered" })
+  })
 })

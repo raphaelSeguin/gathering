@@ -6,6 +6,7 @@ import {
   InvalidCapacityModificationError,
   InvalidDateError,
   MultipleRegistrationError,
+  RegistrationError,
   UnauthorizedCapacityModification,
   UnauthorizedDescriptionModification,
   UnauthorizedTitleModification
@@ -18,7 +19,8 @@ function statusFor(error: Error): number {
   if (error instanceof UnauthorizedCapacityModification
     || error instanceof UnauthorizedDescriptionModification
     || error instanceof UnauthorizedTitleModification) return 403
-  if (error instanceof GatheringNotFoundError) return 404
+  if (error instanceof GatheringNotFoundError
+    || error instanceof RegistrationError) return 404
   if (error instanceof InvalidCapacityModificationError
     || error instanceof MultipleRegistrationError) return 409
   if (error instanceof InvalidCapacityCreationError
