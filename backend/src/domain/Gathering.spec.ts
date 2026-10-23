@@ -239,8 +239,10 @@ describe("Gathering", () => {
       expect(gathering.getDescription()).toStrictEqual(defaultCreationData.description)
     })
 
-    test("The capacity can only be modified to greater value", () => {
-      const capacity = 50
+    test("Capacity can be diminished but cannot make a registered participant waitlisted", () => {
+      const capacity = 5
+      const okModification = 2
+      const invalidModification = 1
       const gathering = Gathering.reconstitue({
         date: FUTURE,
         capacity: capacity,
@@ -249,9 +251,11 @@ describe("Gathering", () => {
       })
       gathering.register("BOB", NOW)
       gathering.register("CHLOE", NOW)
-      const changeCapacity = () => gathering.changeCapacity(1, "ALICE")
-      expect(changeCapacity).toThrow(InvalidCapacityModificationError)
-      expect(gathering.getCapacity()).toStrictEqual(capacity)
+      const okChangeCapacity = () => gathering.changeCapacity(okModification, "ALICE")
+      expect(okChangeCapacity).not.toThrow()
+      const wronglyChangeCapacity = () => gathering.changeCapacity(invalidModification, "ALICE")
+      expect(wronglyChangeCapacity).toThrow(InvalidCapacityModificationError)
+      expect(gathering.getCapacity()).toStrictEqual(okModification)
     })
   })
 })

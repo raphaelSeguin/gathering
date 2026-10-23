@@ -137,8 +137,8 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     if (userId !== this.organizerId) {
       throw new UnauthorizedCapacityModification()
     }
-    if (changedCapacity < this.capacity.getValue()) {
-      throw new InvalidCapacityModificationError(this.capacity.getValue())
+    if (changedCapacity < Math.min(this.participants.length, this.capacity.getValue())) {
+      throw new InvalidCapacityModificationError(this.participants.length, this.capacity.getValue())
     }
 
     // all participants from this.capacity to changedCApacity - 1 get promoted
@@ -229,8 +229,8 @@ export class UnauthorizedTitleModification extends Error {
 }
 
 export class InvalidCapacityModificationError extends Error {
-  constructor(capacity: number) {
-    super(`Capacity can only be augmented, actual capacity : (${capacity})`)
+  constructor(participants: number, capacity: number) {
+    super(`Capacity change cannot make a registered participant waitlisted : (${participants}/${capacity})`)
     this.name = "InvalidCapacityModificationError"
   }
 }
