@@ -38,6 +38,16 @@ describe("FileGatheringRepository", () => {
     expect(found?.getParticipants()).toStrictEqual(["ALICE", "BOB", "CHLOE"])
     expect(found?.getWaitlist()).toStrictEqual(["CHLOE"])
   })
+
+  test("finds all saved gatherings", async () => {
+    const repository = new FileGatheringRepository(filePath)
+    await repository.save(gathering("1234"))
+    await repository.save(gathering("5678"))
+
+    const ids = (await repository.findAll()).map((g) => g.getId())
+
+    expect(ids).toStrictEqual(["1234", "5678"])
+  })
 })
 
 function gathering(id: string, participantsIds: string[] = []): Gathering {

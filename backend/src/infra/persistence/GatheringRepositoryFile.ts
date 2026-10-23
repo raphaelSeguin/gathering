@@ -16,7 +16,8 @@ export class FileGatheringRepository implements GatheringRepository {
   constructor(private readonly filePath: string) { }
 
   async save(gathering: Gathering): Promise<void> {
-    await this.writeRecords([toRecord(gathering)])
+    const records = await this.readRecords()
+    await this.writeRecords([...records, toRecord(gathering)])
   }
 
   async findById(id: string): Promise<Gathering | undefined> {
