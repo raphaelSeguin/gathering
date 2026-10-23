@@ -37,7 +37,7 @@ describe("GET /api/gatherings/:id", () => {
       description: "Test gathering",
       date: "2026-02-02T18:00:00.000Z",
       capacity: 2,
-      participantCount: 2,
+      participantCount: 3,
       waitlist: ["CHLOE"],
       organizerId: "SAM",
       myStatus: "unregistered"

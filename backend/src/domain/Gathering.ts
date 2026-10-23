@@ -80,7 +80,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
   }
 
   getParticipants(): string[] {
-    return this.participants.slice(0, this.capacity.getValue())
+    return this.participants
   }
 
   getWaitlist(): string[] {
@@ -94,7 +94,8 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
     if (now > this.date) {
       throw new LateRegistrationError()
     }
-    const eventType: GatheringEvent["type"] = this.participants.length < this.capacity.getValue()
+    const stillAvailable = this.participants.length < this.capacity.getValue()
+    const eventType: GatheringEvent["type"] = stillAvailable
       ? "participant-confirmed"
       : "participant-waitlisted"
     this.record({
@@ -137,7 +138,7 @@ export class Gathering extends AggragateRoot<GatheringEvent> {
       throw new UnauthorizedCapacityModification()
     }
     if (changedCapacity < this.capacity.getValue()) {
-      throw new InvalidCapacityModificationError(this.participants.length)
+      throw new InvalidCapacityModificationError(this.capacity.getValue())
     }
 
     // all participants from this.capacity to changedCApacity - 1 get promoted
@@ -228,8 +229,8 @@ export class UnauthorizedTitleModification extends Error {
 }
 
 export class InvalidCapacityModificationError extends Error {
-  constructor(participantsCount: number) {
-    super(`Capacity must be at least the number of participants (${participantsCount})`)
+  constructor(capacity: number) {
+    super(`Capacity can only be augmented, actual capacity : (${capacity})`)
     this.name = "InvalidCapacityModificationError"
   }
 }

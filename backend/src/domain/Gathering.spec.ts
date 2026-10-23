@@ -77,12 +77,12 @@ describe("Gathering", () => {
       expect(gathering.getParticipantStatus("CHLOE")).toStrictEqual("waitlisted")
     })
 
-    test("Participants are the confirmed ones, the waitlist keeps the others in order", () => {
+    test("Participants are all the users that registered, confirmed or waitlisted", () => {
       gathering.register("ALICE", NOW)
       gathering.register("BOB", NOW)
       gathering.register("CHLOE", NOW)
       gathering.register("DENIS", NOW)
-      expect(gathering.getParticipants()).toStrictEqual(["ALICE", "BOB"])
+      expect(gathering.getParticipants()).toStrictEqual(["ALICE", "BOB", "CHLOE", "DENIS"])
       expect(gathering.getWaitlist()).toStrictEqual(["CHLOE", "DENIS"])
     })
 
@@ -164,7 +164,7 @@ describe("Gathering", () => {
       })
     })
 
-    test("When capacity is augmented promotion events are sent", () => {
+    test("When capacity is augmented promotion events are sent if users are waitlited", () => {
       gathering.register("ALICE", NOW)
       gathering.register("BOB", NOW)
       gathering.register("CHLOE", NOW)
