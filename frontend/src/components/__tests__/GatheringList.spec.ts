@@ -36,4 +36,17 @@ describe('GatheringList', () => {
     expect(wrapper.findAll('li button').map((b) => b.text())).toEqual(['Join A', 'Join B'])
     expect(wrapper.text()).not.toContain('Nothing here')
   })
+
+  it('makes cards withdrawable and forwards their withdraw event', async () => {
+    const gatherings = [aGathering({ id: 'a' }), aGathering({ id: 'b' })]
+    const wrapper = mount(GatheringList, {
+      props: { heading: 'My registrations', gatherings, emptyMessage: 'Nothing here', withdrawable: true },
+    })
+
+    const cards = wrapper.findAllComponents(GatheringCard)
+    expect(cards.map((c) => c.props('withdrawable'))).toEqual([true, true])
+    await cards[1]!.get('button').trigger('click')
+
+    expect(wrapper.emitted('withdraw')).toEqual([['b']])
+  })
 })
