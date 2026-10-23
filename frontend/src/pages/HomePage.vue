@@ -46,6 +46,8 @@ onMounted(() => store.fetchAll())
       heading="My registrations"
       :gatherings="joined"
       empty-message="You are not registered for any gathering yet."
+      withdrawable
+      @withdraw="store.withdraw"
     />
 
     <GatheringList

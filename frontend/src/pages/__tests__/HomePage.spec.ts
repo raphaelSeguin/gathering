@@ -82,6 +82,37 @@ describe('HomePage', () => {
     expect(wrapper.get('[aria-live="assertive"]').text()).toBe('Already registered')
   })
 
+  it('offers to withdraw only from my registrations', async () => {
+    const wrapper = await mountHome()
+
+    const withdrawButtons = wrapper.findAll('button').filter((b) => b.text() === 'withdraw')
+    expect(withdrawButtons).toHaveLength(1)
+    expect(withdrawButtons[0]!.attributes('aria-label')).toBe('Withdraw from Joined one')
+  })
+
+  it('withdraws and removes the gathering from my registrations', async () => {
+    api.withdraw.mockResolvedValue(undefined)
+    api.get.mockResolvedValue(aGathering({ id: 'joined', title: 'Joined one', myStatus: 'unregistered' }))
+    const wrapper = await mountHome()
+
+    await section(wrapper, 'My registrations').get('button').trigger('click')
+    await flushPromises()
+
+    expect(api.withdraw).toHaveBeenCalledWith('joined')
+    expect(section(wrapper, 'My registrations').text()).not.toContain('Joined one')
+  })
+
+  it('keeps the gathering and shows the error when withdrawal fails', async () => {
+    api.withdraw.mockRejectedValue(new ApiError('Not registered', 409))
+    const wrapper = await mountHome()
+
+    await section(wrapper, 'My registrations').get('button').trigger('click')
+    await flushPromises()
+
+    expect(section(wrapper, 'My registrations').text()).toContain('Joined one')
+    expect(wrapper.get('[aria-live="assertive"]').text()).toBe('Not registered')
+  })
+
   it('links each organized gathering to its edit form', async () => {
     const wrapper = await mountHome()
 
